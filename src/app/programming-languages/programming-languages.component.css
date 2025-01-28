@@ -1,0 +1,21 @@
+.card-animate {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideUp 5s ease-in-out infinite; /* Hacer que la animación dure 5 segundos */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}

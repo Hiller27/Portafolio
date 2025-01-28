@@ -1,6 +1,74 @@
-.card-img-top {
-  object-fit: cover;
-  max-width: 200px;
-  height: auto;
-  margin: 0 auto;
+/* Título con gradiente */
+.soft-gradient {
+  background: linear-gradient(90deg, #6dd5ed, #2193b0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: capitalize;
+  letter-spacing: 2px;
+  font-family: Lucida Sans;
+}
+
+/* Tarjetas */
+.project-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #1e1e1e;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Imagen del proyecto */
+.project-image {
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.9);
+  transition: filter 0.3s ease;
+}
+
+.project-card:hover .project-image {
+  filter: brightness(1.1);
+}
+
+/* Contenido */
+.project-content {
+  padding: 20px;
+  text-align: center;
+  border-top: 1px solid #333; /* Sutil separación */
+}
+
+.project-title {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  color: #6dd5ed; /* Azul claro */
+}
+
+.project-phone {
+  font-size: 1rem;
+  color: #a0a0a0; /* Gris claro */
+  margin-bottom: 15px;
+}
+
+/* Botón */
+.project-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  color: #fff;
+  background: #2193b0; /* Azul suave */
+  border: none;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.project-btn:hover {
+  background: #6dd5ed; /* Más claro al hacer hover */
+  transform: scale(1.1);
 }

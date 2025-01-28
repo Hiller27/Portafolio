@@ -1,14 +1,18 @@
 <div class="container py-5">
-  <h1 class="mb-4 fw-bold text-center" style="font-size: 3rem; font-weight: bold; font-family: fantasy;">Mis proyectos</h1>
+  <h1 class="mb-5 text-center display-3 fw-bold soft-gradient">Mis proyectos</h1>
 
-  <div class="row justify-content-center">
-    <div *ngFor="let project of projects" class="col-md-4 mb-4">
-      <div class="card h-100 shadow-sm border-0 rounded">
-        <img [src]="project.imageUrl" class="card-img-top rounded" [alt]="project.alt">
-        <div class="card-body">
-          <h5 class="card-title">{{ project.name }}</h5>
-          <p class="card-text">Teléfono: {{ project.phone }}</p>
-          <a [href]="project.website" class="btn btn-primary" target="_blank">Visitar Sitio Web</a>
+  <div class="row g-4">
+    <div *ngFor="let project of projects" class="col-12 col-sm-6 col-md-4 col-lg-4">
+      <div class="project-card">
+        <div
+          class="project-image"
+          [style.backgroundImage]="'url(' + project.imageUrl + ')'"
+          style="width: 100%; height: 150px; max-height: 150px;"
+        ></div>
+        <div class="project-content">
+          <h3 class="project-title">{{ project.name }}</h3>
+          <p class="project-phone">{{ project.phone }}</p>
+          <a [href]="project.website" target="_blank" class="project-btn">Explorar</a>
         </div>
       </div>
     </div>

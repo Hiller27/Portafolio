@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { ProfileComponent } from "../profile/profile.component";
 import { ProgrammingLanguagesComponent } from "../programming-languages/programming-languages.component";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule,ProfileComponent, ProgrammingLanguagesComponent],
+  imports: [CommonModule, ProfileComponent, ProgrammingLanguagesComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -14,24 +15,61 @@ export class HomeComponent implements OnInit {
   private canvas!: HTMLCanvasElement;
   private ctx!: CanvasRenderingContext2D;
   private particles: Particle[] = [];
-  private readonly particleCount = 100;
+  private readonly particleCount = 60;
   private maxDistance = 150;
-  private mouseX: number = 0;
-  private mouseY: number = 0;
+  private particleImages: HTMLImageElement[] = [];
+  showProgrammingLanguages: boolean = false;
 
-  constructor(private el: ElementRef) {}
+  constructor(private el: ElementRef, private router: Router,
+    private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.initializeCanvas();
-    this.createParticles();
-    this.animate();
+    this.loadParticleImages();
+  }
+
+  project() {
+    this.router.navigate(['/projects']);
+  }
+
+  private loadParticleImages() {
+    const imagePaths = [
+      'https://img.icons8.com/?size=100&id=UFXRpPFebwa2&format=png&color=000000',
+      'https://img.icons8.com/?size=100&id=71257&format=png&color=000000',
+      'https://img.icons8.com/?size=100&id=13441&format=png&color=000000',
+      'https://img.icons8.com/?size=100&id=m4XmoQpRVreA&format=png&color=000000',
+    ];
+
+    let loadedImages = 0;
+
+    for (const path of imagePaths) {
+      const img = new Image();
+      img.src = path;
+      img.onload = () => {
+        loadedImages++;
+        this.particleImages.push(img);
+
+        if (loadedImages === imagePaths.length) {
+          this.initializeCanvas();
+          this.createParticles();
+          this.animate();
+        }
+      };
+    }
   }
 
   scrollToContent() {
-    const element = document.getElementById('languagesSection');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    this.showProgrammingLanguages = true; // Activar visibilidad
+
+    // Forzar la detección de cambios en Angular
+    this.cdr.detectChanges();
+
+    // Esperar un ciclo de eventos para asegurarse de que el DOM haya actualizado
+    setTimeout(() => {
+      const element = document.getElementById('languagesSection');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 0);
   }
 
   private initializeCanvas() {
@@ -48,27 +86,28 @@ export class HomeComponent implements OnInit {
   private createParticles() {
     this.particles = [];
     for (let i = 0; i < this.particleCount; i++) {
-      this.particles.push(new Particle(this.canvas.width, this.canvas.height));
+      const randomImage =
+        this.particleImages[
+          Math.floor(Math.random() * this.particleImages.length)
+        ];
+      this.particles.push(new Particle(this.canvas.width, this.canvas.height, randomImage));
     }
   }
 
   private animate() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Dibujar partículas
     for (const particle of this.particles) {
       particle.move(this.canvas.width, this.canvas.height);
-      particle.attractTo(this.mouseX, this.mouseY);
       particle.draw(this.ctx);
     }
 
-    // Dibujar líneas entre partículas cercanas
     for (let i = 0; i < this.particles.length; i++) {
       for (let j = i + 1; j < this.particles.length; j++) {
         const distance = this.particles[i].distanceTo(this.particles[j]);
         if (distance < this.maxDistance) {
           this.ctx.strokeStyle = `rgba(200, 200, 200, ${1 - distance / this.maxDistance})`;
-          this.ctx.lineWidth = 3;
+          this.ctx.lineWidth = 4;
           this.ctx.beginPath();
           this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
           this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
@@ -85,12 +124,6 @@ export class HomeComponent implements OnInit {
     this.resizeCanvas();
     this.createParticles();
   }
-
-  @HostListener('mousemove', ['$event'])
-  onMouseMove(event: MouseEvent) {
-    this.mouseX = event.clientX;
-    this.mouseY = event.clientY;
-  }
 }
 
 class Particle {
@@ -98,43 +131,29 @@ class Particle {
   y: number;
   vx: number;
   vy: number;
-  radius: number = 6;
+  radius: number = 36;
+  private image: HTMLImageElement;
 
-  constructor(canvasWidth: number, canvasHeight: number) {
+  constructor(canvasWidth: number, canvasHeight: number, image: HTMLImageElement) {
     this.x = Math.random() * canvasWidth;
     this.y = Math.random() * canvasHeight;
     this.vx = (Math.random() - 0.5) * 2;
     this.vy = (Math.random() - 0.5) * 2;
+    this.image = image;
   }
 
   move(canvasWidth: number, canvasHeight: number) {
     this.x += this.vx;
     this.y += this.vy;
 
-    // Rebotar en los bordes
     if (this.x <= 0 || this.x >= canvasWidth) this.vx *= -1;
     if (this.y <= 0 || this.y >= canvasHeight) this.vy *= -1;
   }
 
-  attractTo(mouseX: number, mouseY: number) {
-    // Atraer las partículas hacia la posición del cursor
-    const dx = mouseX - this.x;
-    const dy = mouseY - this.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance < 100) {
-      const angle = Math.atan2(dy, dx);
-      const force = (100 - distance) / 100; // Fuerza de atracción
-      this.vx += Math.cos(angle) * force;
-      this.vy += Math.sin(angle) * force;
-    }
-  }
-
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = '#ffffff'; // Color de las partículas: negro
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fill();
+    if (this.image.complete) {
+      ctx.drawImage(this.image, this.x - this.radius / 2, this.y - this.radius / 2, this.radius, this.radius);
+    }
   }
 
   distanceTo(other: Particle): number {
@@ -142,5 +161,4 @@ class Particle {
     const dy = this.y - other.y;
     return Math.sqrt(dx * dx + dy * dy);
   }
-
 }

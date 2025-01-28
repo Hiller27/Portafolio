@@ -1,13 +1,21 @@
 <app-profile></app-profile>
-<div class="wrapper">
-  <button  (click)="scrollToContent()">
-   Lenguajes de programacion
+<div class="wrapper justify-content-center">
+  <button (click)="scrollToContent()" class="btn-custom">
+    Lenguajes de programación
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <button (click)="project()" class="btn-custom">
+    Proyectos
     <span></span>
     <span></span>
     <span></span>
     <span></span>
   </button>
 </div>
-<canvas></canvas>
-<app-programming-languages id="languagesSection"></app-programming-languages>
 
+<canvas></canvas>
+<app-programming-languages  *ngIf="showProgrammingLanguages"  id="languagesSection"></app-programming-languages>
